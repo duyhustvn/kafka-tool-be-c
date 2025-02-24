@@ -1,2 +1,24 @@
-obj
 bin
+
+# Ignore Ceedling auto-generated build directories
+/build/
+# Some Ceedling configurations output temporary test build artifacts here
+/test/build/
+
+# Ignore test result files that are generated during test runs
+/test/results.xml
+
+
+# Ignore common compiled file types and coverage files
+*.o
+*.elf
+*.exe
+*.out
+*.gcda
+*.gcno
+*.gcov
+
+# Editor temporary files
+*.swp
+*.swo
+*.tmp

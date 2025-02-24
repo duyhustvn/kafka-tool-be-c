@@ -7,13 +7,14 @@ typedef struct node_ {
 } node;
 
 typedef struct queue_ {
-    struct node_ *head;
-    struct node_ *tail;
+    struct node_ *front;
+    struct node_ *rear;
     int size;
 } queue;
 
 queue *init_queue();
 void enqueue(queue *, char*);
 node* dequeue(queue *);
+void free_queue(queue *);
 
 #endif // QUEUE_H_

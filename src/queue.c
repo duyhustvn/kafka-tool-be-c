@@ -1,6 +1,7 @@
 #include "queue.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 queue* init_queue() {
     queue *q = (queue *)malloc(sizeof(queue));
@@ -8,34 +9,65 @@ queue* init_queue() {
         return NULL;
     }
 
-    q->head = NULL;
-    q->tail = NULL;
+    q->front = NULL;
+    q->rear = NULL;
     q->size = 0;
     return q;
 }
 
-void enqueue(queue *q, char *v) {
-    node new_node = {.value=v, .next=NULL};
+node *create_node(char *v) {
+    node *new_node = malloc(sizeof(node));
+    if (new_node == NULL) {
+        return NULL;
+    }
+    new_node->value = strdup(v);
+    new_node->next = NULL;
+    return new_node;
+}
 
-    if (q->head == NULL) {
+/*
+** Add to the rear
+*/
+void enqueue(queue *q, char *v) {
+    node *new_node = create_node(v);
+
+    if (q->front == NULL) {
         // queue is empty
-        q->head = &new_node;
-        q->tail = &new_node;
+        q->front = new_node;
+        q->rear = new_node;
     } else {
         // queue has item
-        new_node.next = q->head;
-        q->head = &new_node;
+        q->rear->next = new_node;
+        q->rear = new_node;
     }
 
     q->size++;
 }
 
+/*
+** Pop from the front
+*/
 node *dequeue(queue *q) {
-    if (q->head == NULL) {
+    if (q->front == NULL) {
         // queue is empty
         return NULL;
     }
 
-    node *dequeued_node = q->tail;
+    node *dequeued_node = q->front;
+    q->front = q->front->next;
 
+    if (q->size == 1) {
+        q->front = NULL;
+        q->rear = NULL;
+    }
+
+
+    q->size--;
+
+    dequeued_node->next = NULL;
+    return dequeued_node;
+}
+
+void free_queue(queue *q) {
+    free(q);
 }
