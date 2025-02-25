@@ -1,6 +1,5 @@
 #include "unity.h"
 #include "queue.h"
-#include <stdio.h>
 #include <string.h>
 
 // Optional: Code to set up test preconditions.

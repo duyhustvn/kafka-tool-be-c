@@ -2,7 +2,8 @@
 #define TCP_H_
 
 #include <arpa/inet.h>
-#include <string.h>
+
+#include "common.h"
 
 #define LISTEN_BACKLOG 50
 

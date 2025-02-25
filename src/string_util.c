@@ -1,5 +1,4 @@
 #include "string_util.h"
-#include <stdlib.h>
 
 /*
 ** Remove beginning space

@@ -1,7 +1,4 @@
 #include "queue.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 queue* init_queue() {
     queue *q = (queue *)malloc(sizeof(queue));
