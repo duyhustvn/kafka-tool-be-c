@@ -2,12 +2,10 @@
 
 #include "http_request_line.h"
 #include "queue.h"
-#include <string.h>
-
 
 typedef struct Test_ {
     char* input;
-    http_request_line expected;
+    http_request expected;
 } Test;
 
 // Optional: Code to set up test preconditions.
@@ -39,7 +37,7 @@ void test_parse_http_request_line() {
     for (int i = 0; i < n; i++) {
         Test test = tests[i];
 
-        http_request_line *request_line = parse_http_request_line(test.input, strlen(test.input));
+        http_request *request_line = parse_http_request_line(test.input, strlen(test.input));
         TEST_ASSERT_NOT_NULL(request_line);
         TEST_ASSERT_EQUAL_STRING(test.expected.method, request_line->method);
         TEST_ASSERT_EQUAL_STRING(test.expected.path, request_line->path);
