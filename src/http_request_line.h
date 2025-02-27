@@ -8,15 +8,24 @@
 #define HTTP_PATH_MAX_LEN 2048
 #define HTTP_PROTOCOL_MAX_LEN 16
 
+
+/*
+sample http GET request
+
+GET /api/v1/topics HTTP/1.1\r\n
+Content-Type: application/json\r\n
+Agent: Firefox/120.1
+\r\n
+*/
 typedef struct http_request_ {
-    // sample: GET /api/v1/topics HTTP/1.1
     char *method;
     char *path;
     char *protocol;
 } http_request;
 
 http_request* parse_http_request_line(char *request_line, int n);
+http_request* read_http_request(int socket_fd);
 
-int read_http_request(int socket_fd, http_request *request);
+void free_http_request(http_request *request);
 
 #endif // HTTP_REQUEST_LINE_H_

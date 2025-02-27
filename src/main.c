@@ -3,12 +3,13 @@
 #include <unistd.h>
 
 #include "http_request_line.h"
+#include "queue.h"
 #include "tcp.h"
 
 int main() {
     tcp_server server = {0};
 
-    server_status_e status = bind_tcp_port(&server, 8081);
+    server_status_e status = bind_tcp_port(&server, 8080);
     if (status != SERVER_OK) {
         exit(EXIT_FAILURE);
     }
@@ -21,9 +22,10 @@ int main() {
 
     printf("Client connected\n");
 
-    http_request req = {0};
+    http_request *request = read_http_request(client_fd);
 
-    read_http_request(client_fd, &req);
+    printf("request: %s %s %s\n", request->method, request->path, request->protocol);
+    free_http_request(request);
 
     close(server.socket_fd);
     close(client_fd);

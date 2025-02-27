@@ -71,6 +71,14 @@ node *dequeue(queue *q) {
 
 void free_queue(queue *q) {
     if (q) {
+#ifdef DEBUG
+        printf("queue still has %d node. free all nodes and queue\n", q->size);
+#endif
+
+        while (q->size != 0) {
+            node *n = dequeue(q);
+            free_node_queue(n);
+        }
         free(q);
     }
 }
@@ -78,6 +86,9 @@ void free_queue(queue *q) {
 
 void free_node_queue(node *n) {
     if (n) {
+#ifdef DEBUG
+        printf("free_node_queue\n");
+#endif
         free(n->value);
         free(n);
     }

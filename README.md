@@ -10,3 +10,6 @@ sudo gem install ceedling
 ``` sh
 ceedling test:all
 ```
+
+## References
+- [HTTP 1.1 RFC](https://datatracker.ietf.org/doc/html/rfc7230)

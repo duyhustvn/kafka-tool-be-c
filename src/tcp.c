@@ -1,5 +1,6 @@
 #include "tcp.h"
 
+#include <asm-generic/socket.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -16,6 +17,13 @@ server_status_e bind_tcp_port(tcp_server *server, int port) {
     server->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server->socket_fd == -1) {
         printf("Failed to create the socket");
+        return SERVER_SOCKET_ERROR;
+    }
+
+    int opt = 1;
+    // SO_REUSEADDR allow the port to be used immediately after the server stop
+    if (setsockopt(server->socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+        printf("Failed to set socket options");
         return SERVER_SOCKET_ERROR;
     }
 

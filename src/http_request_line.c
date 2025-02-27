@@ -57,24 +57,22 @@ http_request* parse_http_request_line(char *request_line, int len) {
     http_request *request = malloc(sizeof(http_request));
     node* method = dequeue(q);
     request->method = strdup(method->value);
-    // printf("request method: %s\n", request->method);
     free_node_queue(method);
+
     node* path = dequeue(q);
     request->path = strdup(path->value);
-    // printf("request path: %s\n", request->path);
     free_node_queue(path);
+
     node* protocol = dequeue(q);
     request->protocol = strdup(protocol->value);
-    // printf("request protocol: %s\n", request->protocol);
     free_node_queue(protocol);
 
-    // printf("%s %s %s", request->method, request->path, request->protocol);
-
-    free(q);
+    free_queue(q);
     return request;
 };
 
-int read_http_request(int socket_fd, http_request *request) {
+
+http_request* read_http_request(int socket_fd) {
     char buffer[8192] = {0};
 
     // https://man7.org/linux/man-pages/man2/read.2.html
@@ -82,15 +80,26 @@ int read_http_request(int socket_fd, http_request *request) {
     // into the buffer starting at buf
     ssize_t bytes_read = read(socket_fd, buffer, sizeof(buffer)-1);
     if (bytes_read <= 0) {
-        return -1; // reading failed or connection closed
+        return NULL; // reading failed or connection closed
     }
 
     buffer[bytes_read] = '\0';
-    request = parse_http_request_line(buffer, bytes_read);
+    http_request *request = parse_http_request_line(buffer, bytes_read);
 
-    printf("request: %s %s %s", request->method, request->path, request->protocol);
+    // free_http_request(request);
 
-    free(request);
-
-    return 0;
+    return request;
 }
+
+
+void free_http_request(http_request *request) {
+    if (request) {
+#ifdef DEBUG
+        printf("free_http_request\n");
+#endif
+        free(request->method);
+        free(request->path);
+        free(request->protocol);
+        free(request);
+    }
+};
