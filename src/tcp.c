@@ -39,7 +39,7 @@ server_status_e bind_tcp_port(tcp_server *server, int port) {
         return SERVER_LISTEN_ERROR;
     }
 
-    printf("Server bound and listening\n");
+    printf("Server bound and listening on port %d\n", port);
     return SERVER_OK;
 };
 

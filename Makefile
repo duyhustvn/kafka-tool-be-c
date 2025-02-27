@@ -7,6 +7,7 @@
 CC = clang
 CFLAGS = -Wall -g
 
+# make DEBUG=1 to enable DEBUG
 ifdef DEBUG
 	CFLAGS += -DDEBUG
 endif

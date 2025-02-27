@@ -37,7 +37,7 @@ http_request* parse_http_request_line(char *request_line, int len) {
 
 
     if (q->size != 3) {
-// #ifdef DEBUG
+#ifdef DEBUG
         printf("queue size: %d\n", q->size);
         printf("len: %d\n", len);
         printf("request_line: %s\n", request_line);
@@ -46,7 +46,7 @@ http_request* parse_http_request_line(char *request_line, int len) {
             node* nd = dequeue(q);
             printf("node value: %s\n", nd->value);
         }
-// #endif
+#endif
         return NULL;
     }
 
