@@ -34,11 +34,12 @@ http_request* parse_http_request_line(char *request_line, int len) {
         count++;
     }
 
-
-
-    if (q->size != 3) {
 #ifdef DEBUG
-        printf("queue size: %d\n", q->size);
+    printf("queue size: %d\n", q->size);
+#endif
+
+    if (q->size < 3) {
+#ifdef DEBUG
         printf("len: %d\n", len);
         printf("request_line: %s\n", request_line);
         int qs = q->size;
@@ -55,16 +56,19 @@ http_request* parse_http_request_line(char *request_line, int len) {
 
     http_request *request = malloc(sizeof(http_request));
     node* method = dequeue(q);
-    request->method = method->value;
+    request->method = strdup(method->value);
+    // printf("request method: %s\n", request->method);
     free_node_queue(method);
     node* path = dequeue(q);
-    request->path = path->value;
+    request->path = strdup(path->value);
+    // printf("request path: %s\n", request->path);
     free_node_queue(path);
     node* protocol = dequeue(q);
-    request->protocol = protocol->value;
+    request->protocol = strdup(protocol->value);
+    // printf("request protocol: %s\n", request->protocol);
     free_node_queue(protocol);
 
-    printf("%s %s %s", request->method, request->path, request->protocol);
+    // printf("%s %s %s", request->method, request->path, request->protocol);
 
     free(q);
     return request;
@@ -83,6 +87,8 @@ int read_http_request(int socket_fd, http_request *request) {
 
     buffer[bytes_read] = '\0';
     request = parse_http_request_line(buffer, bytes_read);
+
+    printf("request: %s %s %s", request->method, request->path, request->protocol);
 
     free(request);
 
