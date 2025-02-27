@@ -52,3 +52,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 # Clean up object files and executable
 clean:
 	rm -rf $(OBJ_DIR) $(BIN_DIR)
+
+valgrind-check:
+	# valgrind -s --leak-check=yes --track-origins=yes ${BIN_DIR}/${TARGET}
+	valgrind -s --leak-check=full --show-leak-kinds=all --track-origins=yes ${BIN_DIR}/${TARGET}

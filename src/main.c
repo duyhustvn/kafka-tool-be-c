@@ -9,7 +9,7 @@
 int main() {
     tcp_server server = {0};
 
-    server_status_e status = bind_tcp_port(&server, 8080);
+    server_status_e status = bind_tcp_port(&server, 8081);
     if (status != SERVER_OK) {
         exit(EXIT_FAILURE);
     }

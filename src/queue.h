@@ -18,5 +18,6 @@ queue *init_queue();
 void enqueue(queue *, char*);
 node* dequeue(queue *);
 void free_queue(queue *);
+void free_node_queue(node*);
 
 #endif // QUEUE_H_

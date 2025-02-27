@@ -18,6 +18,10 @@ node *create_node(char *v) {
         return NULL;
     }
     new_node->value = strdup(v);
+    if (!new_node->value) {
+        free(new_node);
+        return NULL;
+    }
     new_node->next = NULL;
     return new_node;
 }
@@ -66,5 +70,15 @@ node *dequeue(queue *q) {
 }
 
 void free_queue(queue *q) {
-    free(q);
+    if (q) {
+        free(q);
+    }
 }
+
+
+void free_node_queue(node *n) {
+    if (n) {
+        free(n->value);
+        free(n);
+    }
+};

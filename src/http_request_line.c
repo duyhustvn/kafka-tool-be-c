@@ -45,23 +45,28 @@ http_request* parse_http_request_line(char *request_line, int len) {
         for (int i = 0; i < qs; i++) {
             node* nd = dequeue(q);
             printf("node value: %s\n", nd->value);
+            free_node_queue(nd);
         }
 #endif
+        free(q);
         return NULL;
     }
 
 
     http_request *request = malloc(sizeof(http_request));
     node* method = dequeue(q);
-    // TODO: do I need to free the node, and the node is in stack or heap
     request->method = method->value;
+    free_node_queue(method);
     node* path = dequeue(q);
     request->path = path->value;
+    free_node_queue(path);
     node* protocol = dequeue(q);
     request->protocol = protocol->value;
+    free_node_queue(protocol);
 
     printf("%s %s %s", request->method, request->path, request->protocol);
 
+    free(q);
     return request;
 };
 
