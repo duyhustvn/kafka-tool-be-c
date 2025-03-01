@@ -17,15 +17,15 @@ Content-Type: application/json\r\n
 Agent: Firefox/120.1
 \r\n
 */
-typedef struct http_request_ {
+typedef struct http_request_line_ {
     char *method;
     char *path;
     char *protocol;
-} http_request;
+} http_request_line;
 
-http_request* parse_http_request_line(char *request_line, int n);
-http_request* read_http_request(int socket_fd);
+http_request_line* parse_http_request_line(char *request_line, int n);
+http_request_line* read_http_request(int socket_fd);
 
-void free_http_request(http_request *request);
+void free_http_request(http_request_line *request);
 
 #endif // HTTP_REQUEST_LINE_H_

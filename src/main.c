@@ -22,7 +22,7 @@ int main() {
 
     printf("Client connected\n");
 
-    http_request *request = read_http_request(client_fd);
+    http_request_line *request = read_http_request(client_fd);
 
     printf("request: %s %s %s\n", request->method, request->path, request->protocol);
     free_http_request(request);
