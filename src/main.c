@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "http_request_line.h"
-#include "queue.h"
+#include "http_request.h"
 #include "tcp.h"
 
 int main() {
@@ -22,10 +21,8 @@ int main() {
 
     printf("Client connected\n");
 
-    http_request_line *request = read_http_request(client_fd);
+    read_http_request(client_fd);
 
-    printf("request: %s %s %s\n", request->method, request->path, request->protocol);
-    free_http_request(request);
 
     close(server.socket_fd);
     close(client_fd);

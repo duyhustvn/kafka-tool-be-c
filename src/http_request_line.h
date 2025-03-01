@@ -24,8 +24,7 @@ typedef struct http_request_line_ {
 } http_request_line;
 
 http_request_line* parse_http_request_line(char *request_line, int n);
-http_request_line* read_http_request(int socket_fd);
 
-void free_http_request(http_request_line *request);
+void free_http_request_line(http_request_line *request);
 
 #endif // HTTP_REQUEST_LINE_H_
