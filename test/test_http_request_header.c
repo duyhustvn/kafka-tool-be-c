@@ -1,5 +1,6 @@
 #include "unity.h"
 
+#include "common.h"
 #include "http_request_header.h"
 
 typedef struct Test_ {

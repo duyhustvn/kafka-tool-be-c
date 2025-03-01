@@ -75,7 +75,7 @@ http_request_line* parse_http_request_line(char *request_line, int len) {
 void free_http_request_line(http_request_line *request) {
     if (request) {
 #ifdef DEBUG
-        printf("free_http_request\n");
+        printf("free http request line\n");
 #endif
         free(request->method);
         free(request->path);

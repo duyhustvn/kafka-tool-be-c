@@ -2,6 +2,7 @@
 #include "http_request_header.h"
 #include "string_util.h"
 #include "http_request_line.h"
+#include <string.h>
 
 int read_http_request(int socket_fd) {
     char buffer[8192] = {0};
@@ -46,17 +47,19 @@ int read_http_request(int socket_fd) {
 
     // Extract the header
     buffer_len = strlen(buffer);
-    char *http_header_str = extract_http_request(buffer, buffer_len);
+    char *http_header_str = extract_http_request_header(buffer, buffer_len);
 
 #ifdef DEBUG
-    printf("http header: \n%s\n\n", http_header_str);
+    printf("http header: \n%s\n", http_header_str);
 #endif
 
     http_request_line *request = parse_http_request_line(http_request_line_str, bytes_read);
 
-    printf("http request line: %s %s %s\n", request->method, request->path, request->protocol);
-    free_http_request_line(request);
+    printf("Request line: \n%s %s %s\n", request->method, request->path, request->protocol);
+    parse_http_request_headers(http_header_str, strlen(http_header_str));
 
+
+    free_http_request_line(request);
     free(http_header_str);
 
     return -1;
