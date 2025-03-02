@@ -1,4 +1,5 @@
 #include "string_util.h"
+#include <string.h>
 
 /*
 ** Remove beginning space
@@ -14,17 +15,14 @@ char* trim_left(char *s, int n) {
     }
 
     int new_len = n - i;
-    char* new_str = malloc(new_len * sizeof(char));
+    char* new_str = malloc((new_len + 1) * sizeof(char));
     if (new_str == NULL) {
         // failed to allocated new memory
         return s;
     }
-    int j;
-    for (j = 0; j < new_len; j++) {
-        new_str[j] = s[i];
-        i++;
-    }
-    new_str[j] = '\0';
+    strncpy(new_str, s+i, new_len);
+
+    new_str[new_len] = '\0';
     return new_str;
 }
 
@@ -42,16 +40,13 @@ char* trim_right(char *s, int n) {
     }
 
     int new_len = i+1;
-    char* new_str = malloc(new_len * sizeof(char));
+    char* new_str = malloc((new_len + 1) * sizeof(char));
     if (new_str == NULL) {
         // failed to allocated new memory
         return s;
     }
-    int j;
-    for (j = 0; j < new_len; j++) {
-        new_str[j] = s[j];
-    }
-    new_str[j] = '\0';
+    strncpy(new_str, s, new_len);
+    new_str[new_len] = '\0';
     return new_str;
 }
 

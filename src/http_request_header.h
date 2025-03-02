@@ -6,7 +6,6 @@ typedef struct http_request_header_ {
     char* value;
 } http_request_header;
 
-char* extract_http_request_header(char* , int /*length of the string*/);
 http_request_header *parse_http_request_headers(char *, int /*length of the string*/);
 http_request_header *parse_http_request_header(char *, int /*left*/, int /*right*/);
 

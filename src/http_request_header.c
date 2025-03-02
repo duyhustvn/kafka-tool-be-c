@@ -3,24 +3,6 @@
 #include "common.h"
 #include "string_util.h"
 
-char* extract_http_request_header(char* s, int n) {
-    int http_header_len = 0;
-    for (int i = 0; i < n; i++) {
-        if (s[i+0] == '\r' && s[i+1] == '\n' &&
-            s[i+2] == '\r' && s[i+3] == '\n') {
-            http_header_len = i+2;
-            break;
-        }
-    }
-
-    char *http_header_str = malloc(http_header_len+1);
-    strncpy(http_header_str, s, http_header_len);
-    http_header_str[http_header_len + 1] = '\0';
-
-    return http_header_str;
-};
-
-
 http_request_header *parse_http_request_headers(char *header_str, int header_str_len) {
     if (header_str_len < 3) {
        // at least a:b

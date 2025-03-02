@@ -19,48 +19,39 @@ int read_http_request(int socket_fd) {
 
     size_t buffer_len = strlen(buffer);
 
+    http_request_component component = parse_http_request_component(buffer, buffer_len);
 
-#ifdef DEBUG
-    printf("original buffer: %s\n", buffer);
-#endif
-
-    int http_request_line_len = 0;
-    for (int i = 0; i < buffer_len-1; i++) {
-        if (buffer[i] == '\r' && buffer[i+1] == '\n') {
-            http_request_line_len = i;
-            break;
-        }
-    }
-
-    char http_request_line_str[http_request_line_len+1];
-    strncpy(http_request_line_str, buffer, http_request_line_len);
-    http_request_line_str[http_request_line_len+1] = '\0';
-#ifdef DEBUG
-    printf("http_request_line_str: %s len %lu\n", http_request_line_str, strlen(http_request_line_str));
-#endif
-
-    cut_off_first_n_character(buffer, http_request_line_len+2);
-
-#ifdef DEBUG
-    printf("buffer remain length: %lu\n%s\n", strlen(buffer), buffer);
-#endif
-
-    // Extract the header
-    buffer_len = strlen(buffer);
-    char *http_header_str = extract_http_request_header(buffer, buffer_len);
-
-#ifdef DEBUG
-    printf("http header: \n%s\n", http_header_str);
-#endif
-
-    http_request_line *request = parse_http_request_line(http_request_line_str, bytes_read);
-
+    http_request_line *request = parse_http_request_line(component.request_line_start, component.request_line_length);
     printf("Request line: \n%s %s %s\n", request->method, request->path, request->protocol);
-    parse_http_request_headers(http_header_str, strlen(http_header_str));
 
+    parse_http_request_headers(component.request_headers_start, component.request_headers_length);
 
     free_http_request_line(request);
-    free(http_header_str);
 
     return -1;
 }
+
+
+http_request_component parse_http_request_component(char* request, int request_length) {
+    http_request_component component = {0};
+
+    component.request_line_start = request;
+    char *request_line = request;
+    while (!(*request_line == '\r' && *(request_line + 1) == '\n')) {
+        request_line++;
+    }
+    component.request_line_length = request_line - request;
+
+
+    component.request_headers_start = request_line + 2; 
+
+    char *request_headers = request_line + 2;
+    while (!(*request_headers == '\r' &&  *(request_headers+1) == '\n' &&
+        *(request_headers+2) == '\r' && *(request_headers+3) == '\n')
+    ) {
+        request_headers++;
+    }
+    component.request_headers_length = request_headers - component.request_headers_start + 2; // include "\r\n" at the end of headers
+
+    return component;
+};
