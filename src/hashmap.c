@@ -110,16 +110,32 @@ char *get(hashmap *h, char *key) {
     return NULL;
 };
 
+void free_linked_list(linked_list *ll) {
+    if (ll) {
+        item *tmp = ll->head;
+        while (ll->size != 0) {
+            tmp = tmp->next;
+            free(ll->head->key);
+            free(ll->head->value);
+            free(ll->head);
+            ll->head = tmp;
+            ll->size--;
+        }
+
+        free(ll);
+    }
+}
 
 void free_hashmap(hashmap *h) {
     if (h) {
         for (int i = 0; i < h->key_range; i++) {
             linked_list *bucket = h->buckets[i];
             if (bucket) {
-                free(bucket);
+                free_linked_list(bucket);
             }
         }
 
+        free(h->buckets);
         free(h);
     }
 };
