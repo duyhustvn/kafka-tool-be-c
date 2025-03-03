@@ -32,17 +32,22 @@ hashmap *init_hashmap() {
     return h;
 };
 
-int hashcode(int key_range, char *key) {
+int hashcode(int key_range, char *key, int key_length) {
     int code = 0;
-    while (*key != '\0') {
-        code += *key;
+
+    for (int i = 0; i < key_length; i++) {
+        code += key[i];
     }
 
     return code % key_range;
 }
 
 int insert(hashmap *h, char *key, char *value){
-    int bucket_id = hashcode(h->key_range, key);
+    int bucket_id = hashcode(h->key_range, key, strlen(key));
+
+#ifdef DEBUG
+    printf("insert key: %s value: %s into bucket: %d\n", key, value, bucket_id);
+#endif
 
     linked_list *bucket = h->buckets[bucket_id];
     item *cur = bucket->head;
@@ -81,9 +86,40 @@ item *create_item(char *key, char *value) {
         return NULL;
     }
 
-    new_item->key = key;
-    new_item->value = value;
+    new_item->key = strdup(key);
+    new_item->value = strdup(value);
     new_item->next = NULL;
     new_item->previous = NULL;
     return new_item;
 }
+
+
+char *get(hashmap *h, char *key) {
+    int bucket_id = hashcode(h->key_range, key, strlen(key));
+
+    linked_list *bucket = h->buckets[bucket_id];
+    item *cur = bucket->head;
+
+    while (cur != NULL) {
+        if (strncmp(key, cur->key, strlen(key)) == 0) {
+            // Found the key
+            return cur->value;
+        }
+        cur = cur->next;
+    }
+    return NULL;
+};
+
+
+void free_hashmap(hashmap *h) {
+    if (h) {
+        for (int i = 0; i < h->key_range; i++) {
+            linked_list *bucket = h->buckets[i];
+            if (bucket) {
+                free(bucket);
+            }
+        }
+
+        free(h);
+    }
+};

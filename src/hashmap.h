@@ -24,9 +24,12 @@ typedef struct hashmap_ {
 
 item *create_item(char *key, char* value);
 linked_list *init_linked_list();
+
 hashmap *init_hashmap();
 int insert(hashmap *h, char *key, char *value);
-int hashcode(int key_range, char *key);
+int hashcode(int key_range, char *key, int key_length);
+char *get(hashmap *h, char *key);
+void free_hashmap(hashmap *h);
 
 
 #endif // HASHMAP_H_

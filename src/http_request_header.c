@@ -1,78 +1,62 @@
 #include "http_request_header.h"
 
-#include "common.h"
 #include "string_util.h"
 
-http_request_header *parse_http_request_headers(char *header_str, int header_str_len) {
+hashmap *parse_http_request_headers(char *header_str, int header_str_len) {
     if (header_str_len < 3) {
        // at least a:b
        return NULL;
     }
 
-    int cur_number_headers = 0;
-    int capacity = 2;
-
-
-    http_request_header *request_headers = malloc(capacity * sizeof(http_request_header));
-    if (request_headers == NULL) {
+    hashmap *headers = init_hashmap();
+    if (headers == NULL) {
         return NULL;
     }
 
     char left = 0;
     char right = 0;
-    printf("Headers: \n");
+
     for (int i = 0; i < header_str_len-1; i++) {
         if (header_str[i] == '\r' && header_str[i+1] == '\n') {
             right = i-1;
-            http_request_header *request_header = parse_http_request_header(header_str, left, right);
-            if (request_header == NULL) {
+            int result = parse_http_request_header(header_str, left, right, headers);
+            if (result == -1) {
                 return NULL;
             }
-            printf("%s: %s\n", request_header->key, request_header->value);
 
             left = i+2;
             right = i+3;
         }
     }
-    return request_headers;
+    return headers;
 };
 
 
-http_request_header *parse_http_request_header(char *header_str, int left_idx, int right_idx) {
-    http_request_header *request_header = malloc(sizeof(http_request_header));
-    if (request_header == NULL) {
-        return NULL;
-    }
-
+int parse_http_request_header(char *header_str, int left_idx, int right_idx, hashmap *headers) {
     for (int i = left_idx; i <= right_idx; i++) {
-        if (header_str[i] == ':') {
+        if (*(header_str+i) == ':') {
             // split at first :
             // the line may have more than one :
             int sub_len = i-left_idx;
-            char *key = malloc(sizeof(char) * sub_len+1);
-            if (key == NULL) {
-                return NULL;
-            }
+
+            char key[sub_len+1];
             strncpy(key, header_str+left_idx, sub_len);
             key[sub_len] = '\0';
-            request_header->key = strdup(key);
-            free(key);
 
             sub_len = right_idx - i;
-            char *value = malloc(sizeof(char) * sub_len+1);
-            if (value == NULL) {
-                return NULL;
-            }
+            char value[sub_len+1];
             strncpy(value, header_str+i+1, sub_len);
             value[sub_len] = '\0';
-
             char *trimmed_value = trim_left(value, strlen(value));
-            free(value);
-            request_header->value = strdup(trimmed_value);
+
+            int resutl = insert(headers, key, trimmed_value);
+            if (resutl == -1) {
+                printf("failed to insert to hashmap\n");
+            }
+
             free(trimmed_value);
-        
-            return request_header;
+            break;
         }
     }
-    return NULL;
+    return 1;
 };

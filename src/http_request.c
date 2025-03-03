@@ -1,4 +1,5 @@
 #include "http_request.h"
+#include "hashmap.h"
 #include "http_request_header.h"
 #include "string_util.h"
 #include "http_request_line.h"
@@ -21,12 +22,28 @@ int read_http_request(int socket_fd) {
 
     http_request_component component = parse_http_request_component(buffer, buffer_len);
 
-    http_request_line *request = parse_http_request_line(component.request_line_start, component.request_line_length);
-    printf("Request line: \n%s %s %s\n", request->method, request->path, request->protocol);
+    http_request_line *request_line = parse_http_request_line(component.request_line_start, component.request_line_length);
+    printf("Request line: \n%s %s %s\n", request_line->method, request_line->path, request_line->protocol);
 
-    parse_http_request_headers(component.request_headers_start, component.request_headers_length);
+    hashmap *headers = parse_http_request_headers(component.request_headers_start, component.request_headers_length);
+    if (headers == NULL) {
+        return -1;
+    }
 
-    free_http_request_line(request);
+#ifdef DEBUG
+    printf("Headers: \n");
+    char *hostname = get(headers, "Host");
+    printf("Hostname: %s\n", hostname);
+    char *user_agent = get(headers, "User-Agent");
+    printf("User-Agent: %s\n", user_agent);
+    char *accept = get(headers, "Accept");
+    printf("Accept: %s\n", accept);
+#endif 
+
+
+    free_http_request_line(request_line);
+    free_hashmap(headers);
+
 
     return -1;
 }
