@@ -10,12 +10,16 @@
 
 
 /*
+A http request-line begins with a method token, followed by a single space
+(SP), the request-target, another single space (SP), the protocol
+version, and ends with CRLF.
+
+    request-line   = method SP request-target SP HTTP-version CRLF
+
 sample http GET request
 
 GET /api/v1/topics HTTP/1.1\r\n
-Content-Type: application/json\r\n
-Agent: Firefox/120.1
-\r\n
+
 */
 typedef struct http_request_line_ {
     char *method;

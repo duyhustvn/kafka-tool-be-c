@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "http_header.h"
 #include "http_request.h"
+#include "http_response.h"
 #include "tcp.h"
 
 int main() {
@@ -13,34 +15,33 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    int client_fd = accept_client(server.socket_fd);
-    if (client_fd == -1) {
-        close(server.socket_fd);
-        exit(EXIT_FAILURE);
+    while (1) {
+        int client_fd = accept_client(server.socket_fd);
+        if (client_fd == -1) {
+            continue;
+        }
+
+        printf("Client connected\n");
+
+        read_http_request(client_fd);
+
+        http_response *response = malloc(sizeof(http_response));
+        if (response == NULL) {
+            continue; 
+        }
+
+        init_http_response(response);
+        add_http_header(&(response->headers), &(response->header_count), "Content-Type", "application/json");
+        add_http_header(&(response->headers), &(response->header_count), "Connection", "close");
+
+        printf("Headers response: \n");
+        for (int i = 0; i < response->header_count; i++) {
+            printf("%s: %s\n", response->headers[i].key, response->headers[i].value);
+        }
+
+        close(client_fd);
     }
 
-    printf("Client connected\n");
-
-    read_http_request(client_fd);
-
-
     close(server.socket_fd);
-    close(client_fd);
     return 0;
 }
-
-// int main() {
-//     char * str = "GET /index.html HTTP/1.1";
-//     http_request_line *res = parse_http_request_line(str, strlen(str));
-//     printf("method: %s| ", res->method);
-//     printf("path: %s| ", res->path);
-//     printf("protocol: %s| ", res->protocol);
-//     printf("\n");
-//
-//     str = "POST /api/v1/list HTTP/1.1";
-//     res = parse_http_request_line(str, strlen(str));
-//     printf("method: %s| ", res->method);
-//     printf("path: %s| ", res->path);
-//     printf("protocol: %s| ", res->protocol);
-//     printf("\n");
-// }
