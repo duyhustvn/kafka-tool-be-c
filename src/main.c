@@ -39,6 +39,8 @@ int main() {
             printf("%s: %s\n", response->headers[i].key, response->headers[i].value);
         }
 
+        send_http_response(client_fd, response);
+
         close(client_fd);
     }
 
