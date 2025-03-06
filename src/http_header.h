@@ -9,5 +9,6 @@ typedef struct http_header_ {
 } http_header;
 
 int add_http_header(http_header **headers, size_t *cur_header_count, const char *key, const char *value);
+void free_http_header(http_header *headers, size_t header_count);
 
 #endif // HTTP_HEADER_H_

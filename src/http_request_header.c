@@ -34,7 +34,7 @@ hashmap *parse_http_request_headers(char *header_str, int header_str_len) {
 
 int parse_http_request_header(char *header_str, int left_idx, int right_idx, hashmap *headers) {
     for (int i = left_idx; i <= right_idx; i++) {
-        if (*(header_str+i) == ':') {
+        if (header_str[i] == ':') {
             // split at first :
             // the line may have more than one :
             int sub_len = i-left_idx;

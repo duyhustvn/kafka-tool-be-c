@@ -39,7 +39,15 @@ int main() {
             printf("%s: %s\n", response->headers[i].key, response->headers[i].value);
         }
 
+        printf("Body of response");
+        char response_body[] = "{\"code\": 1}";
+        response->body = response_body;
+        response->body_length = strlen(response_body);
+
         send_http_response(client_fd, response);
+
+        free_http_header(response->headers, response->header_count);
+        free(response);
 
         close(client_fd);
     }

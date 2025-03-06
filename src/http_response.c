@@ -1,7 +1,5 @@
 #include "http_response.h"
 #include "http_header.h"
-#include <stdio.h>
-#include <string.h>
 #include <sys/socket.h>
 
 
@@ -44,7 +42,13 @@ char* construct_http_response(http_response *response, size_t *response_length) 
 
     offset += snprintf(buffer+offset, buffer_size-offset, "\r\n");
 
-    // TODO Add body to response
+    if (response->body_length > 0) {
+        if (offset + response->body_length + 1 > buffer_size) {
+            buffer_size = offset + response->body_length + 1;
+            buffer = realloc(buffer, buffer_size);
+        }
+        offset += snprintf(buffer+offset, buffer_size-offset, "%s", response->body);
+    }
 
     *response_length = offset;
     return buffer;
@@ -60,6 +64,7 @@ void send_http_response(int client_fd, http_response *response) {
 
     size_t total_sent = 0;
     while (total_sent < response_length) {
+        // https://man7.org/linux/man-pages/man2/send.2.html
         ssize_t bytes_sent = send(client_fd, response_data+total_sent, response_length-total_sent, 0);
         if (bytes_sent <= 0) {
             break;
@@ -67,4 +72,6 @@ void send_http_response(int client_fd, http_response *response) {
 
         total_sent += bytes_sent;
     }
+
+    free(response_data);
 };
