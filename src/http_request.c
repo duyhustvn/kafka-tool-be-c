@@ -1,9 +1,9 @@
 #include "http_request.h"
+#include "common.h"
 #include "hashmap.h"
 #include "http_request_header.h"
 #include "string_util.h"
-#include "http_request_line.h"
-#include <string.h>
+#include "queue.h"
 
 int read_http_request(int socket_fd) {
     char buffer[8192] = {0};
@@ -13,7 +13,7 @@ int read_http_request(int socket_fd) {
     // into the buffer starting at buf
     ssize_t bytes_read = read(socket_fd, buffer, sizeof(buffer)-1);
     if (bytes_read <= 0) {
-        return -1; // reading failed or connection closed
+        return NOT_OK; // reading failed or connection closed
     }
 
     buffer[bytes_read] = '\0';
@@ -22,13 +22,23 @@ int read_http_request(int socket_fd) {
 
     http_request_component component = parse_http_request_component(buffer, buffer_len);
 
-    http_request_line *request_line = parse_http_request_line(component.request_line_start, component.request_line_length);
-    printf("Request line: \n%s %s %s\n", request_line->method, request_line->path, request_line->protocol);
+    http_request *request = malloc(sizeof(http_request));
+    if (!request) {
+        return NOT_OK;
+    }
+
+    int res = extract_http_request_line(request, component.request_line_start, component.request_line_length);
+    if (res == NOT_OK) {
+        printf("extract_http_request_line failed");
+        return NOT_OK;
+    }
+    printf("Request line: \n%s %s %s\n", request->method, request->path, request->protocol);
 
     hashmap *headers = parse_http_request_headers(component.request_headers_start, component.request_headers_length);
     if (headers == NULL) {
-        return -1;
+        return NOT_OK;
     }
+    request->headers = headers;
 
 #ifdef DEBUG
     printf("Headers: \n");
@@ -41,11 +51,9 @@ int read_http_request(int socket_fd) {
 #endif 
 
 
-    free_http_request_line(request_line);
-    free_hashmap(headers);
+    free_http_request(request);
 
-
-    return -1;
+    return OK;
 }
 
 
@@ -71,4 +79,88 @@ http_request_component parse_http_request_component(char* request, int request_l
     component.request_headers_length = request_headers - component.request_headers_start + 2; // include "\r\n" at the end of headers
 
     return component;
+};
+
+int extract_http_request_line(http_request *request, char *request_line, int len) {
+    int count = 0;
+    int start = 0;
+
+    queue *q = init_queue();
+    if (!q) {
+        return NOT_OK;
+    }
+
+    for (int i = 0; i < len; i++) {
+        char c = request_line[i];
+        if  (c == ' ') {
+            char item[count];
+            strncpy(item, request_line + start, count);
+            start = i+1;
+            item[count] = '\0';
+            count = 0;
+            enqueue(q, item);
+            continue;
+        }
+
+        else if (i == len-1) {
+            char item[count+1];
+            strncpy(item, request_line + start, count+1);
+            start = i+1;
+            item[count+1] = '\0';
+            enqueue(q, item);
+            count = 0;
+            continue;
+        }
+        count++;
+    }
+
+#ifdef DEBUG
+    printf("queue size: %d\n", q->size);
+#endif
+
+    if (q->size < 3) {
+#ifdef DEBUG
+        printf("len: %d\n", len);
+        printf("request_line: %s\n", request_line);
+        int qs = q->size;
+        for (int i = 0; i < qs; i++) {
+            node* nd = dequeue(q);
+            printf("node value: %s\n", nd->value);
+            free_node_queue(nd);
+        }
+#endif
+        free(q);
+        return NOT_OK;
+    }
+
+
+    node* method = dequeue(q);
+    request->method = strdup(method->value);
+    free_node_queue(method);
+
+    node* path = dequeue(q);
+    request->path = strdup(path->value);
+    free_node_queue(path);
+
+    node* protocol = dequeue(q);
+    request->protocol = strdup(protocol->value);
+    free_node_queue(protocol);
+
+    free_queue(q);
+    return OK;
+};
+
+int free_http_request(http_request *request) {
+    if (request) {
+#ifdef DEBUG
+        printf("free http request line\n");
+#endif
+        free(request->method);
+        free(request->path);
+        free(request->protocol);
+        free_hashmap(request->headers);
+        free(request);
+    }
+
+    return OK;
 };

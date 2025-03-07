@@ -20,7 +20,7 @@ hashmap *init_hashmap() {
         return NULL;
     }
 
-    h->key_range = 100;
+    h->key_range = 7;
     h->buckets = malloc(h->key_range * sizeof(linked_list));
     if (h->buckets == NULL) {
         return NULL;
