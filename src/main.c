@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "http_header.h"
+#include "http_method.h"
 #include "http_request.h"
 #include "http_response.h"
+#include "handler.h"
+#include "route.h"
 #include "tcp.h"
 
 int main() {
@@ -15,6 +19,8 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+    handle_func(HTTP_METHOD_GET, "/api/v1/healthz", healthcheck_handler);
+
     while (1) {
         int client_fd = accept_client(server.socket_fd);
         if (client_fd == -1) {
@@ -23,31 +29,22 @@ int main() {
 
         printf("Client connected\n");
 
-        read_http_request(client_fd);
+        http_request request = {0};
+        read_http_request(client_fd, &request);
 
-        http_response *response = malloc(sizeof(http_response));
-        if (response == NULL) {
-            continue; 
-        }
+        http_response response = {0};
+        init_http_response(&response);
 
-        init_http_response(response);
-        add_http_header(&(response->headers), &(response->header_count), "Content-Type", "application/json");
-        add_http_header(&(response->headers), &(response->header_count), "Connection", "close");
+        if (!handle_request(&request, &response)) {
+            response.status_code = 404;
+            strncpy(response.reason_phrase, "NOT FOUND", strlen("NOT FOUND"));
+            response.reason_phrase[strlen("NOT FOUND")] = '\0';
+        };
 
-        printf("Headers response: \n");
-        for (int i = 0; i < response->header_count; i++) {
-            printf("%s: %s\n", response->headers[i].key, response->headers[i].value);
-        }
+        send_http_response(client_fd, &response);
 
-        printf("Body of response");
-        char response_body[] = "{\"code\": 1}";
-        response->body = response_body;
-        response->body_length = strlen(response_body);
-
-        send_http_response(client_fd, response);
-
-        free_http_header(response->headers, response->header_count);
-        free(response);
+        free_http_header(response.headers, response.header_count);
+        free_http_request(&request);
 
         close(client_fd);
     }

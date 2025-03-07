@@ -1,0 +1,9 @@
+#ifndef HTTP_METHOD_H_
+#define HTTP_METHOD_H_
+
+#define HTTP_METHOD_GET "GET"
+#define HTTP_METHOD_POST "POST"
+#define HTTP_METHOD_PUT "PUT"
+#define HTTP_METHOD_DELETE "DELETE"
+
+#endif // HTTP_METHOD_H_

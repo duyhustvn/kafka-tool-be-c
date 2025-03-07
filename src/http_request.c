@@ -5,7 +5,7 @@
 #include "string_util.h"
 #include "queue.h"
 
-int read_http_request(int socket_fd) {
+int read_http_request(int socket_fd, http_request *request) {
     char buffer[8192] = {0};
 
     // https://man7.org/linux/man-pages/man2/read.2.html
@@ -21,11 +21,6 @@ int read_http_request(int socket_fd) {
     size_t buffer_len = strlen(buffer);
 
     http_request_component component = parse_http_request_component(buffer, buffer_len);
-
-    http_request *request = malloc(sizeof(http_request));
-    if (!request) {
-        return NOT_OK;
-    }
 
     int res = extract_http_request_line(request, component.request_line_start, component.request_line_length);
     if (res == NOT_OK) {
@@ -49,9 +44,6 @@ int read_http_request(int socket_fd) {
     char *accept = get(headers, "Accept");
     printf("Accept: %s\n", accept);
 #endif 
-
-
-    free_http_request(request);
 
     return OK;
 }
@@ -159,7 +151,7 @@ int free_http_request(http_request *request) {
         free(request->path);
         free(request->protocol);
         free_hashmap(request->headers);
-        free(request);
+        // free(request);
     }
 
     return OK;
