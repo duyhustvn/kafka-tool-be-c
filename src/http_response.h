@@ -26,5 +26,6 @@ void init_http_response(http_response *response);
 
 char* construct_http_response(http_response *response, size_t *response_length);
 void send_http_response(int client_fd, http_response *response);
+void free_http_response(http_response *response);
 
 #endif // HTTP_RESPONSE_H_

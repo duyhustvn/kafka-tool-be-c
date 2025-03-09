@@ -43,10 +43,14 @@ int main() {
 
         send_http_response(client_fd, &response);
 
-        free_http_header(response.headers, response.header_count);
-        free_http_request(&request);
 
         close(client_fd);
+
+        // free request
+        free_http_request(&request);
+
+        // free response
+        free_http_response(&response);
     }
 
     close(server.socket_fd);

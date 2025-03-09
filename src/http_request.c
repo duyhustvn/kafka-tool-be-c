@@ -145,7 +145,7 @@ int extract_http_request_line(http_request *request, char *request_line, int len
 int free_http_request(http_request *request) {
     if (request) {
 #ifdef DEBUG
-        printf("free http request line\n");
+        printf("free http request\n");
 #endif
         free(request->method);
         free(request->path);

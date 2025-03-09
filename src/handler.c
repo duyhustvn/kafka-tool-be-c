@@ -27,8 +27,8 @@ void healthcheck_handler(http_request *request, http_response *response) {
         printf("%s: %s\n", response->headers[i].key, response->headers[i].value);
     }
 
-    printf("Body of response");
-    char response_body[] = "{\"code\": 1}";
-    response->body = response_body;
+    printf("Body of response\n");
+    char response_body[] = "{\"status\": \"ok\"}";
+    response->body = strdup(response_body);
     response->body_length = strlen(response_body);
 };

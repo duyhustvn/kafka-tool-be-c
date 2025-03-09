@@ -62,6 +62,10 @@ void send_http_response(int client_fd, http_response *response) {
         return;
     }
 
+#ifdef DEBUG
+    printf("response_data: %s\n", response_data);
+#endif
+
     size_t total_sent = 0;
     while (total_sent < response_length) {
         // https://man7.org/linux/man-pages/man2/send.2.html
@@ -74,4 +78,16 @@ void send_http_response(int client_fd, http_response *response) {
     }
 
     free(response_data);
+};
+
+
+void free_http_response(http_response *response) {
+#ifdef DEBUG
+    printf("free http response\n");
+#endif
+
+    if (response) {
+        free_http_header(response->headers, response->header_count);
+        free(response->body);
+    }
 };
