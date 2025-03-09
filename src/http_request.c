@@ -43,6 +43,12 @@ int read_http_request(int socket_fd, http_request *request) {
     printf("User-Agent: %s\n", user_agent);
     char *accept = get(headers, "Accept");
     printf("Accept: %s\n", accept);
+
+    printf("Body: \n");
+    for (int i = 0; i < component.request_body_length; i++)  {
+        printf("%c", *(component.request_body_start+i));
+    }
+    printf("\n");
 #endif 
 
     return OK;
@@ -50,26 +56,38 @@ int read_http_request(int socket_fd, http_request *request) {
 
 
 http_request_component parse_http_request_component(char* request, int request_length) {
+    int offset = 0;
+
     http_request_component component = {0};
 
+    // http request line
     component.request_line_start = request;
     char *request_line = request;
     while (!(*request_line == '\r' && *(request_line + 1) == '\n')) {
         request_line++;
     }
     component.request_line_length = request_line - request;
+    offset += component.request_line_length + 2;
 
-
-    component.request_headers_start = request_line + 2; 
-
+    // http headers
+    component.request_headers_start = request_line + 2;
     char *request_headers = request_line + 2;
     while (!(*request_headers == '\r' &&  *(request_headers+1) == '\n' &&
         *(request_headers+2) == '\r' && *(request_headers+3) == '\n')
     ) {
         request_headers++;
     }
-    component.request_headers_length = request_headers - component.request_headers_start + 2; // include "\r\n" at the end of headers
+    component.request_headers_length = request_headers - component.request_headers_start + 2; // include "\r\n" before the new line "\r\n"
+    offset += component.request_headers_length + 2;
 
+    // http body
+    if (offset >= request_length) {
+        // has no body
+        return component;
+    }
+
+    component.request_body_start = request_headers + 4;
+    component.request_body_length = request_length - offset;
     return component;
 };
 

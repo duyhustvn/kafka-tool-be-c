@@ -11,6 +11,7 @@ typedef struct http_request_ {
     char *path;
     char *protocol;
     hashmap *headers;
+    char *body;
 } http_request;
 
 typedef struct http_request_component_ {
