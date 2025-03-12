@@ -2,14 +2,17 @@
 #define HTTP_REQUEST_H_
 
 #include "common.h"
+
 #include "hashmap.h"
 #include "http_header.h"
-#include <stddef.h>
+#include "http_query_string.h"
+
 
 typedef struct http_request_ {
     char *method;
     char *path;
     char *protocol;
+    http_query_string *query_strings;
     hashmap *headers;
     char *body;
 } http_request;

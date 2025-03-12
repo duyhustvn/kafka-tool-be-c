@@ -9,5 +9,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #endif // COMMON_H_

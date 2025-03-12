@@ -4,6 +4,8 @@
 #include "http_request_header.h"
 #include "string_util.h"
 #include "queue.h"
+#include <stdbool.h>
+#include <string.h>
 
 int read_http_request(int socket_fd, http_request *request) {
     char buffer[8192] = {0};
@@ -149,7 +151,20 @@ int extract_http_request_line(http_request *request, char *request_line, int len
     free_node_queue(method);
 
     node* path = dequeue(q);
-    request->path = strdup(path->value);
+    char *path_str = path->value;
+    bool has_query_string = false;
+    for (int i  = 0; i < strlen(path_str); i++) {
+        if (path_str[i] == '?') {
+            has_query_string = true;
+            request->path = malloc(i+1);
+            strncpy(request->path, path_str, i);
+            request->path[i] = '\0';
+            break;
+        }
+    }
+    if (!has_query_string) {
+        request->path = strdup(path_str);
+    }
     free_node_queue(path);
 
     node* protocol = dequeue(q);
