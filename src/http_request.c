@@ -1,6 +1,7 @@
 #include "http_request.h"
 #include "common.h"
 #include "hashmap.h"
+#include "http_query_string.h"
 #include "http_request_header.h"
 #include "string_util.h"
 #include "queue.h"
@@ -153,18 +154,26 @@ int extract_http_request_line(http_request *request, char *request_line, int len
     node* path = dequeue(q);
     char *path_str = path->value;
     bool has_query_string = false;
+    char *query_string_start;
+    int query_string_len = 0;
     for (int i  = 0; i < strlen(path_str); i++) {
         if (path_str[i] == '?') {
             has_query_string = true;
             request->path = malloc(i+1);
             strncpy(request->path, path_str, i);
             request->path[i] = '\0';
+
+            query_string_start = path_str + i  + 1;
+            query_string_len = strlen(path_str) - i - 1;
             break;
         }
     }
     if (!has_query_string) {
         request->path = strdup(path_str);
+    } else {
+        parse_http_query_string(&request->query_strings, query_string_start, query_string_len);
     }
+
     free_node_queue(path);
 
     node* protocol = dequeue(q);
