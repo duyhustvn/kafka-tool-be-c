@@ -13,6 +13,7 @@ typedef struct http_request_ {
     char *path;
     char *protocol;
     http_query_string *query_strings;
+    size_t query_string_count;
     hashmap *headers;
     char *body;
 } http_request;

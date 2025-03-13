@@ -30,7 +30,6 @@ int read_http_request(int socket_fd, http_request *request) {
         printf("extract_http_request_line failed");
         return NOT_OK;
     }
-    printf("Request line: \n%s %s %s\n", request->method, request->path, request->protocol);
 
     hashmap *headers = parse_http_request_headers(component.request_headers_start, component.request_headers_length);
     if (headers == NULL) {
@@ -39,6 +38,13 @@ int read_http_request(int socket_fd, http_request *request) {
     request->headers = headers;
 
 #ifdef DEBUG
+    printf("Request line: \n%s %s %s\n", request->method, request->path, request->protocol);
+
+    printf("Query string\n");
+    for (int i = 0; i < request->query_string_count; i++) {
+        printf("%s: %s\n", request->query_strings[i].key, request->query_strings[i].value);
+    }
+
     printf("Headers: \n");
     char *hostname = get(headers, "Host");
     printf("Hostname: %s\n", hostname);
@@ -171,7 +177,7 @@ int extract_http_request_line(http_request *request, char *request_line, int len
     if (!has_query_string) {
         request->path = strdup(path_str);
     } else {
-        parse_http_query_string(&request->query_strings, query_string_start, query_string_len);
+        parse_http_query_string(&request->query_strings, &request->query_string_count, query_string_start, query_string_len);
     }
 
     free_node_queue(path);
