@@ -5,8 +5,6 @@
 #include "http_request_header.h"
 #include "string_util.h"
 #include "queue.h"
-#include <stdbool.h>
-#include <string.h>
 
 int read_http_request(int socket_fd, http_request *request) {
     char buffer[8192] = {0};
@@ -199,6 +197,7 @@ int free_http_request(http_request *request) {
         free(request->path);
         free(request->protocol);
         free_hashmap(request->headers);
+        free_http_query_strings(request->query_strings, request->query_string_count);
         // free(request);
     }
 

@@ -40,6 +40,9 @@ int parse_http_query_string(http_query_string **query_strings, size_t *query_str
         }
     }
 
+    free(key);
+    free(value);
+
     return OK;
 };
 
@@ -55,4 +58,21 @@ int add_http_query_string(http_query_string **query_strings, size_t *query_strin
 
     (*query_string_count)++;
     return OK;
+};
+
+
+void free_http_query_string(http_query_string *query_string) {
+    if (query_string) {
+        free(query_string->key);
+        free(query_string->value);
+    }
+};
+
+
+void free_http_query_strings(http_query_string *query_strings, size_t query_string_count) {
+    for (int i = 0; i < query_string_count; i++) {
+        free_http_query_string(query_strings + i);
+    }
+
+    free(query_strings);
 };
