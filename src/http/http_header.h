@@ -1,7 +1,7 @@
 #ifndef HTTP_HEADER_H_
 #define HTTP_HEADER_H_
 
-#include "common.h"
+#include "../common.h"
 
 typedef struct http_header_ {
     char *key;

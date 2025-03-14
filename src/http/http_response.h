@@ -1,7 +1,7 @@
 #ifndef HTTP_RESPONSE_H_
 #define HTTP_RESPONSE_H_
 
-#include "common.h"
+#include "../common.h"
 #include "http_header.h"
 
 /*

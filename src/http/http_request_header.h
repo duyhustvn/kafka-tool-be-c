@@ -1,8 +1,8 @@
 #ifndef HTTP_REQUEST_HEADER_H_
 #define HTTP_REQUEST_HEADER_H_
 
-#include "common.h"
-#include "hashmap.h"
+#include "../common.h"
+#include "../hashmap.h"
 
 typedef struct http_request_header_ {
     char* key;

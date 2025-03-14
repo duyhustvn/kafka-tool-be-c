@@ -3,8 +3,8 @@
 
 #include "common.h"
 
-#include "http_request.h"
-#include "http_response.h"
+#include "./http/http_request.h"
+#include "./http/http_response.h"
 
 bool handle_request(http_request *request, http_response *response);
 

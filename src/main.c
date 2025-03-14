@@ -3,10 +3,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "http_header.h"
-#include "http_method.h"
-#include "http_request.h"
-#include "http_response.h"
+#include "./http/http_header.h"
+#include "./http/http_method.h"
+#include "./http/http_request.h"
+#include "./http/http_response.h"
 #include "handler.h"
 #include "route.h"
 #include "tcp.h"

@@ -1,8 +1,8 @@
 #ifndef ROUTE_H_
 #define ROUTE_H_
 
-#include "http_request.h"
-#include "http_response.h"
+#include "./http/http_request.h"
+#include "./http/http_response.h"
 
 #define MAX_ROUTES 100
 

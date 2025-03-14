@@ -1,9 +1,9 @@
 #ifndef HTTP_REQUEST_H_
 #define HTTP_REQUEST_H_
 
-#include "common.h"
+#include "../common.h"
 
-#include "hashmap.h"
+#include "../hashmap.h"
 #include "http_header.h"
 #include "http_query_string.h"
 

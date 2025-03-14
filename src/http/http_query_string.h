@@ -1,7 +1,7 @@
 #ifndef HTTP_QUERY_STRING_H_
 #define HTTP_QUERY_STRING_H_
 
-#include "common.h"
+#include "../common.h"
 
 typedef struct http_query_string_ {
     char *key;
