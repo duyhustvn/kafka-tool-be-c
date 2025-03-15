@@ -1,8 +1,16 @@
 #include "http_request_header.h"
 
-#include "string_util.h"
+#include "../string_util.h"
 
 hashmap *parse_http_request_headers(char *header_str, int header_str_len) {
+ #ifdef DEBUG
+    printf("\nEXTRACT HTTP REQUEST HEADERS %d BYTES \n", header_str_len);
+    for (int i = 0; i < header_str_len; i++) {
+        printf("%c", *(header_str+i));
+    }
+    printf("\n");
+#endif
+
     if (header_str_len < 3) {
        // at least a:b
        return NULL;
@@ -13,12 +21,19 @@ hashmap *parse_http_request_headers(char *header_str, int header_str_len) {
         return NULL;
     }
 
-    char left = 0;
-    char right = 0;
+    int left = 0;
+    int right = 0;
 
     for (int i = 0; i < header_str_len-1; i++) {
         if (header_str[i] == '\r' && header_str[i+1] == '\n') {
             right = i-1;
+#ifdef DEBUG
+            printf("Header string: ");
+            for (int i = left; i <= right; i++) {
+                printf("%c", header_str[i]);
+            }
+            printf("\n");
+#endif
             int result = parse_http_request_header(header_str, left, right, headers);
             if (result == -1) {
                 return NULL;
@@ -28,6 +43,11 @@ hashmap *parse_http_request_headers(char *header_str, int header_str_len) {
             right = i+3;
         }
     }
+
+#ifdef DEBUG
+            printf("Parse http request header done\n");
+#endif
+
     return headers;
 };
 

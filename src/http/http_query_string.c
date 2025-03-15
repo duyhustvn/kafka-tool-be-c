@@ -1,5 +1,5 @@
 #include "http_query_string.h"
-#include "common.h"
+#include "../common.h"
 #include <stdlib.h>
 #include <string.h>
 

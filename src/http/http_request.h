@@ -32,8 +32,7 @@ typedef struct http_request_component_ {
 int read_http_request(int socket_fd, http_request *request);
 http_request_component parse_http_request_component(char* request, int request_length);
 int extract_http_request_line(http_request *request, char *request_line, int len);
-
 int free_http_request(http_request *request);
-
+void print_http_request_component(http_request_component component);
 
 #endif // HTTP_REQUEST_H_
