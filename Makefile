@@ -13,7 +13,7 @@ ifdef DEBUG
 endif
 
 # Project files
-LIBS = #-lpthread
+LIBS = -lmemcached
 
 # Directories
 SRC_DIR = src
