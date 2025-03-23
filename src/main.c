@@ -1,18 +1,38 @@
+#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "./http/http_header.h"
 #include "./http/http_method.h"
 #include "./http/http_request.h"
 #include "./http/http_response.h"
+#include "config/config.h"
+#include "config/kafka_config.h"
 #include "handler.h"
+#include "kafka/kafka_consumer.h"
 #include "route.h"
 #include "tcp.h"
 
 int main() {
     tcp_server server = {0};
+
+    Config config = {0};
+    KafkaConfig kafka_config = {0};
+    char errstr[512];
+
+    if (!load_config(&config, &kafka_config, errstr)) {
+        warnx("%s", errstr);
+        exit(EXIT_FAILURE);
+    };
+    warnx("Load app config successfully");
+
+    KafkaConsumer kafka_consumer = {0};
+    if (!init_kafka_consumer(&kafka_consumer, config, errstr)) {
+        warnx("%s", errstr);
+        exit(EXIT_FAILURE);
+    }
+    warnx("Init kafka consumer successfully");
 
     server_status_e status = bind_tcp_port(&server, 8080);
     if (status != SERVER_OK) {

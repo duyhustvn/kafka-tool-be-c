@@ -13,7 +13,7 @@ ifdef DEBUG
 endif
 
 # Project files
-LIBS = -lmemcached
+LIBS = -lmemcached -lrdkafka
 
 # Directories
 SRC_DIR = src
@@ -48,6 +48,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 # Create object directory if it doesn't exist
 #$(OBJ_DIR):
 #	mkdir -p $(OBJ_DIR) $(LIBS)
+
+run:
+	KAFKA_BROKERS=172.17.0.1:9097 KAFKA_TOPIC=test KAFKA_GROUP_ID=test_client KAFKA_POOL_TIMEOUT_MS=100 ./bin/main
 
 # Clean up object files and executable
 clean:
