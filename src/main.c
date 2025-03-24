@@ -34,6 +34,19 @@ int main() {
     }
     warnx("Init kafka consumer successfully");
 
+    int topic_cnt = 1;
+    char *topic = "test";
+    char **topics = &topic;
+    /* Convert the list of topics to a format suitable for librdkafka */
+    rd_kafka_topic_partition_list_t *topic_partitions = rd_kafka_topic_partition_list_new(topic_cnt);
+    for (int i = 0; i < topic_cnt; i++) {
+        rd_kafka_topic_partition_list_add(topic_partitions, topics[i], /*The parition is ignored by subscribe()*/ RD_KAFKA_PARTITION_UA);
+    }
+    bool consume_res = consume_message(&kafka_consumer, topic_partitions, config.kafka_config->pool_timeout_ms, errstr);
+    if (!consume_res) {
+        errx(EXIT_FAILURE, "Consume kafka message failed: %s", errstr);
+    }
+
     server_status_e status = bind_tcp_port(&server, 8080);
     if (status != SERVER_OK) {
         exit(EXIT_FAILURE);

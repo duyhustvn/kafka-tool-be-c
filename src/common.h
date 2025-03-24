@@ -14,5 +14,6 @@
 #include <stddef.h>
 #include <err.h>
 #include <time.h>
+#include <signal.h>
 
 #endif // COMMON_H_

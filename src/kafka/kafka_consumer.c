@@ -3,18 +3,31 @@
 #include <err.h>
 #include <librdkafka/rdkafka.h>
 #include <stdbool.h>
+#include <stdio.h>
 
+static void print_assignment(const rd_kafka_t *rk,
+                             rd_kafka_topic_partition_list_t *partitions) {
 
+    printf("%s assigned partitions: [", rd_kafka_name(rk));
+    for (int i = 0; i < partitions->cnt; i++) {
+        const rd_kafka_topic_partition_t *p = &partitions->elems[i];
+        printf("%s%d]", (i>0) ? ", ": "", p->partition);
+    }
+    printf("\n");
+}
 
-void rebalance_cb(rd_kafka_t *rk,
+static void rebalance_cb(rd_kafka_t *rk,
                   rd_kafka_resp_err_t err,
                   rd_kafka_topic_partition_list_t *partitions,
                   void *opaque) {
+    warnx("Rebalance callback");
     switch (err) {
         case RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS:
+            print_assignment(rk, partitions);
             rd_kafka_assign(rk, partitions);
             break;
         case RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS:
+            print_assignment(rk, partitions);
             rd_kafka_assign(rk, NULL);
             break;
         default:
@@ -66,5 +79,54 @@ bool init_kafka_consumer(KafkaConsumer *consumer, Config app_config, char *errst
     }
 
     rd_kafka_poll_set_consumer(consumer->rk);
+    consumer->run = true;
+    return true;
+};
+
+
+bool consume_message(KafkaConsumer *consumer, rd_kafka_topic_partition_list_t *topics, int poll_timeout_ms, const char* errstr) {
+    warnx("Start consume kafka message with timeout: %d", poll_timeout_ms);
+
+#ifdef DEBUG
+    printf("Topics: ");
+    for (int i = 0; i < topics->cnt; i++) {
+        printf("%s ", topics->elems[i].topic);
+    }
+    printf("\n");
+#endif
+
+    rd_kafka_resp_err_t err = rd_kafka_subscribe(consumer->rk, topics);
+    if (err) {
+        errstr = rd_kafka_err2str(err);
+        return false;
+    }
+
+    while (consumer->run) {
+        rd_kafka_message_t *msg = rd_kafka_consumer_poll(consumer->rk, poll_timeout_ms);
+        if (!msg) {
+#ifdef DEBUG
+            warnx("No message");
+#endif
+            continue;
+        }
+
+        if (msg->err) {
+            switch (msg->err) {
+                case RD_KAFKA_RESP_ERR__PARTITION_EOF:
+                    errstr = rd_kafka_message_errstr(msg);
+                default:
+                    errstr = rd_kafka_message_errstr(msg);
+            }
+            warnx("[consume_message] failed %s", errstr);
+        } else {
+#ifdef DEBUG
+        printf("Received message (offset %"PRId64", partition: %d): %.*s", msg->offset, msg->partition, (int)msg->len, (char*)msg->payload);
+#endif
+
+        printf("Received message (offset %"PRId64", partition: %d): %.*s", msg->offset, msg->partition, (int)msg->len, (char*)msg->payload);
+        }
+
+        rd_kafka_message_destroy(msg);
+    }
     return true;
 };
