@@ -8,10 +8,10 @@
 static void print_assignment(const rd_kafka_t *rk,
                              rd_kafka_topic_partition_list_t *partitions) {
 
-    printf("%s assigned partitions: [", rd_kafka_name(rk));
+    printf("%s assigned partitions: ", rd_kafka_name(rk));
     for (int i = 0; i < partitions->cnt; i++) {
         const rd_kafka_topic_partition_t *p = &partitions->elems[i];
-        printf("%s%d]", (i>0) ? ", ": "", p->partition);
+        printf("[%d]%s", p->partition, (i != partitions->cnt - 1) ? ", ": "");
     }
     printf("\n");
 }
@@ -104,9 +104,6 @@ bool consume_message(KafkaConsumer *consumer, rd_kafka_topic_partition_list_t *t
     while (consumer->run) {
         rd_kafka_message_t *msg = rd_kafka_consumer_poll(consumer->rk, poll_timeout_ms);
         if (!msg) {
-#ifdef DEBUG
-            warnx("No message");
-#endif
             continue;
         }
 
@@ -120,10 +117,8 @@ bool consume_message(KafkaConsumer *consumer, rd_kafka_topic_partition_list_t *t
             warnx("[consume_message] failed %s", errstr);
         } else {
 #ifdef DEBUG
-        printf("Received message (offset %"PRId64", partition: %d): %.*s", msg->offset, msg->partition, (int)msg->len, (char*)msg->payload);
+        printf("Received message (offset %"PRId64", partition: %d): %.*s\n\n", msg->offset, msg->partition, (int)msg->len, (char*)msg->payload);
 #endif
-
-        printf("Received message (offset %"PRId64", partition: %d): %.*s", msg->offset, msg->partition, (int)msg->len, (char*)msg->payload);
         }
 
         rd_kafka_message_destroy(msg);

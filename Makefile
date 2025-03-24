@@ -3,8 +3,8 @@
 #  $^ The names of all the prerequisite files (space-separated)
 #  $* The stem (the bit which matches the `%` wildcard in the rule definition.
 # Compiler flags
-# CC = gcc
-CC = clang
+# CC = gcc -std=gnu17
+CC = clang -std=gnu17
 CFLAGS = -Wall -g
 
 # make DEBUG=1 to enable DEBUG
@@ -18,10 +18,10 @@ LIBS = -lmemcached -lrdkafka
 # Directories
 SRC_DIR = src
 OBJ_DIR = obj
-BIN_DIR = bin
+BIN_DIR = build
 
 # Output executable
-TARGET = main
+TARGET = kafka-tool-be-c
 
 # Find all source files (.c) in the src/ directory and subdirectories
 SRC = $(shell find $(SRC_DIR) -name '*.c')
@@ -50,7 +50,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 #	mkdir -p $(OBJ_DIR) $(LIBS)
 
 run:
-	KAFKA_BROKERS=172.17.0.1:9097 KAFKA_TOPIC=test KAFKA_GROUP_ID=test_client KAFKA_POOL_TIMEOUT_MS=100 ./bin/main
+	KAFKA_BROKERS=172.17.0.1:9095 KAFKA_TOPIC=suricata KAFKA_GROUP_ID=test_client KAFKA_POOL_TIMEOUT_MS=100 ./build/kafka-tool-be-c
 
 # Clean up object files and executable
 clean:

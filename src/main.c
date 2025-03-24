@@ -35,8 +35,8 @@ int main() {
     warnx("Init kafka consumer successfully");
 
     int topic_cnt = 1;
-    char *topic = "test";
-    char **topics = &topic;
+    const char *topic = kafka_config.topic;
+    const char **topics = &topic;
     /* Convert the list of topics to a format suitable for librdkafka */
     rd_kafka_topic_partition_list_t *topic_partitions = rd_kafka_topic_partition_list_new(topic_cnt);
     for (int i = 0; i < topic_cnt; i++) {

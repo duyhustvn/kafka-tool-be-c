@@ -1,7 +1,5 @@
 #include "handler.h"
 #include "route.h"
-#include <stdbool.h>
-#include <string.h>
 
 extern route routes[];
 extern int route_count;
