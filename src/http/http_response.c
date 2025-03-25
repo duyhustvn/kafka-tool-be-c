@@ -10,7 +10,7 @@ void init_http_response(http_response *response) {
     response->header_count = 0;
     response->body = NULL;
     response->body_length = 0;
-};
+}
 
 
 char* construct_http_response(http_response *response, size_t *response_length) {
@@ -25,7 +25,7 @@ char* construct_http_response(http_response *response, size_t *response_length) 
     size_t offset =  snprintf(buffer, buffer_size, "HTTP/1.1 %d %s\r\n", response->status_code, response->reason_phrase);
 
     // response headers
-    for (int i = 0; i < response->header_count; i++) {
+    for (size_t i = 0; i < response->header_count; i++) {
         // get the length of header
         http_header header = response->headers[i];
         size_t header_length = snprintf(NULL, 0, "%s: %s\r\n", header.key, header.value);
@@ -52,7 +52,7 @@ char* construct_http_response(http_response *response, size_t *response_length) 
 
     *response_length = offset;
     return buffer;
-};
+}
 
 
 void send_http_response(int client_fd, http_response *response) {
@@ -78,7 +78,7 @@ void send_http_response(int client_fd, http_response *response) {
     }
 
     free(response_data);
-};
+}
 
 
 void free_http_response(http_response *response) {
@@ -90,4 +90,4 @@ void free_http_response(http_response *response) {
         free_http_header(response->headers, response->header_count);
         free(response->body);
     }
-};
+}

@@ -49,7 +49,7 @@ hashmap *parse_http_request_headers(char *header_str, int header_str_len) {
 #endif
 
     return headers;
-};
+}
 
 
 int parse_http_request_header(char *header_str, int left_idx, int right_idx, hashmap *headers) {
@@ -79,4 +79,4 @@ int parse_http_request_header(char *header_str, int left_idx, int right_idx, has
         }
     }
     return 1;
-};
+}

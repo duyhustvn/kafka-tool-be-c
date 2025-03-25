@@ -21,7 +21,7 @@ void healthcheck_handler(http_request *request, http_response *response) {
     add_http_header(&(response->headers), &(response->header_count), "Connection", "close");
 
     printf("Headers response: \n");
-    for (int i = 0; i < response->header_count; i++) {
+    for (size_t i = 0; i < response->header_count; i++) {
         printf("%s: %s\n", response->headers[i].key, response->headers[i].value);
     }
 
@@ -29,4 +29,4 @@ void healthcheck_handler(http_request *request, http_response *response) {
     char response_body[] = "{\"status\": \"ok\"}";
     response->body = strdup(response_body);
     response->body_length = strlen(response_body);
-};
+}

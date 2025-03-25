@@ -3,9 +3,7 @@
 #include "../hashmap.h"
 #include "http_query_string.h"
 #include "http_request_header.h"
-#include "../string_util.h"
 #include "../queue.h"
-#include <stdio.h>
 
 int read_http_request(int socket_fd, http_request *request) {
     char buffer[8192] = {0};
@@ -49,7 +47,7 @@ int read_http_request(int socket_fd, http_request *request) {
     printf("Request line: \n%s %s %s\n", request->method, request->path, request->protocol);
 
     printf("Query string\n");
-    for (int i = 0; i < request->query_string_count; i++) {
+    for (size_t i = 0; i < request->query_string_count; i++) {
         printf("%s: %s\n", request->query_strings[i].key, request->query_strings[i].value);
     }
 
@@ -62,7 +60,7 @@ int read_http_request(int socket_fd, http_request *request) {
     printf("Accept: %s\n", accept);
 
     printf("Body: \n");
-    for (int i = 0; i < component.request_body_length; i++)  {
+    for (size_t i = 0; i < component.request_body_length; i++)  {
         printf("%c", *(component.request_body_start+i));
     }
     printf("\n");
@@ -106,7 +104,7 @@ http_request_component parse_http_request_component(char* request, int request_l
     component.request_body_start = request_headers + 4;
     component.request_body_length = request_length - offset;
     return component;
-};
+}
 
 int extract_http_request_line(http_request *request, char *request_line, int len) {
 #ifdef DEBUG
@@ -177,7 +175,7 @@ int extract_http_request_line(http_request *request, char *request_line, int len
     bool has_query_string = false;
     char *query_string_start;
     int query_string_len = 0;
-    for (int i  = 0; i < strlen(path_str); i++) {
+    for (size_t i  = 0; i < strlen(path_str); i++) {
         if (path_str[i] == '?') {
             has_query_string = true;
             request->path = malloc(i+1);
@@ -203,7 +201,7 @@ int extract_http_request_line(http_request *request, char *request_line, int len
 
     free_queue(q);
     return OK;
-};
+}
 
 int free_http_request(http_request *request) {
     if (request) {
@@ -219,25 +217,25 @@ int free_http_request(http_request *request) {
     }
 
     return OK;
-};
+}
 
 
 void print_http_request_component(http_request_component component) {
     printf("REQUEST LINE: %lu bytes\n", component.request_line_length);
-    for (int i = 0; i < component.request_line_length; i++) {
+    for (size_t i = 0; i < component.request_line_length; i++) {
         printf("%c", *(component.request_line_start + i));
     }
     printf("\n");
 
     printf("REQUEST HEADERS: %lu bytes\n", component.request_headers_length);
-    for (int i = 0; i < component.request_headers_length; i++) {
+    for (size_t i = 0; i < component.request_headers_length; i++) {
         printf("%c", *(component.request_headers_start + i));
     }
     printf("\n");
 
     printf("REQUEST BODY: %lu bytes\n", component.request_body_length);
-    for (int i = 0; i < component.request_body_length; i++) {
+    for (size_t i = 0; i < component.request_body_length; i++) {
         printf("%c", *(component.request_body_start + i));
     }
     printf("\n");
-};
+}

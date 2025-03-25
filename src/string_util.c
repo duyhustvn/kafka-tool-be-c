@@ -49,16 +49,3 @@ char* trim_right(char *s, int n) {
     new_str[new_len] = '\0';
     return new_str;
 }
-
-
-void cut_off_first_n_character(char* s, int n) {
-#ifdef DEBUG
-    printf("cutoff first %d character from %s", n , s);
-#endif
-    if (n >= strlen(s)) {
-        s[0] = '\0';
-        return;
-    }
-
-    memmove(s, s + n, strlen(s) - n + 1);
-};

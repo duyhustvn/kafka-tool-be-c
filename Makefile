@@ -50,7 +50,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 #	mkdir -p $(OBJ_DIR) $(LIBS)
 
 run:
-	KAFKA_BROKERS=172.17.0.1:9095 KAFKA_TOPIC=suricata KAFKA_GROUP_ID=test_client KAFKA_POOL_TIMEOUT_MS=100 ./build/kafka-tool-be-c
+	KAFKA_BROKERS=172.17.0.1:9095 KAFKA_TOPIC=suricata KAFKA_GROUP_ID=test_client KAFKA_POLL_TIMEOUT_MS=100 ./build/kafka-tool-be-c
 
 # Clean up object files and executable
 clean:

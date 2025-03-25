@@ -28,7 +28,7 @@ MemcachedConnection *init_memcached_connection(const char *server_list) {
     }
 
     return conn;
-};
+}
 
 char *get_value_from_memcached(MemcachedConnection *conn, const char *key) {
     if (!conn->connected) {
@@ -46,7 +46,7 @@ char *get_value_from_memcached(MemcachedConnection *conn, const char *key) {
     }
 
     return NULL;
-};
+}
 
 
 bool set_value_into_memcached(MemcachedConnection *conn, const char *key, const char* value, time_t ttl) {
@@ -60,4 +60,4 @@ bool set_value_into_memcached(MemcachedConnection *conn, const char *key, const 
         return false;
     }
     return true;
-};
+}

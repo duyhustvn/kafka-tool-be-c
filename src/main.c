@@ -19,12 +19,12 @@ int main() {
 
     Config config = {0};
     KafkaConfig kafka_config = {0};
-    char errstr[512];
+    char errstr[512] = "";
 
     if (!load_config(&config, &kafka_config, errstr)) {
         warnx("%s", errstr);
         exit(EXIT_FAILURE);
-    };
+    }
     warnx("Load app config successfully");
 
     KafkaConsumer kafka_consumer = {0};
@@ -42,7 +42,7 @@ int main() {
     for (int i = 0; i < topic_cnt; i++) {
         rd_kafka_topic_partition_list_add(topic_partitions, topics[i], /*The parition is ignored by subscribe()*/ RD_KAFKA_PARTITION_UA);
     }
-    bool consume_res = consume_message(&kafka_consumer, topic_partitions, config.kafka_config->pool_timeout_ms, errstr);
+    bool consume_res = consume_message(&kafka_consumer, topic_partitions, config.kafka_config->poll_timeout_ms, errstr);
     if (!consume_res) {
         errx(EXIT_FAILURE, "Consume kafka message failed: %s", errstr);
     }
@@ -72,7 +72,7 @@ int main() {
             response.status_code = 404;
             strncpy(response.reason_phrase, "NOT FOUND", strlen("NOT FOUND"));
             response.reason_phrase[strlen("NOT FOUND")] = '\0';
-        };
+        }
 
         send_http_response(client_fd, &response);
 

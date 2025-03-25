@@ -49,7 +49,7 @@ server_status_e bind_tcp_port(tcp_server *server, int port) {
 
     printf("Server bound and listening on port %d\n", port);
     return SERVER_OK;
-};
+}
 
 
 /*
@@ -66,4 +66,4 @@ int accept_client(int server_fd) {
     }
 
     return client_fd;
-};
+}

@@ -13,4 +13,4 @@ int handle_func(char* http_method, char* path, void (*handler)(http_request*, ht
     }
 
     return route_count;
-};
+}

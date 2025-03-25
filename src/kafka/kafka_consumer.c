@@ -64,7 +64,7 @@ rd_kafka_conf_t *init_kafka_consumer_config(Config app_conf, char *errstr) {
     }
 
     return conf;
-};
+}
 
 
 bool init_kafka_consumer(KafkaConsumer *consumer, Config app_config, char *errstr) {
@@ -81,7 +81,7 @@ bool init_kafka_consumer(KafkaConsumer *consumer, Config app_config, char *errst
     rd_kafka_poll_set_consumer(consumer->rk);
     consumer->run = true;
     return true;
-};
+}
 
 
 bool consume_message(KafkaConsumer *consumer, rd_kafka_topic_partition_list_t *topics, int poll_timeout_ms, const char* errstr) {
@@ -111,6 +111,7 @@ bool consume_message(KafkaConsumer *consumer, rd_kafka_topic_partition_list_t *t
             switch (msg->err) {
                 case RD_KAFKA_RESP_ERR__PARTITION_EOF:
                     errstr = rd_kafka_message_errstr(msg);
+                    break;
                 default:
                     errstr = rd_kafka_message_errstr(msg);
             }
@@ -124,4 +125,4 @@ bool consume_message(KafkaConsumer *consumer, rd_kafka_topic_partition_list_t *t
         rd_kafka_message_destroy(msg);
     }
     return true;
-};
+}

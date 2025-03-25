@@ -96,4 +96,4 @@ void free_node_queue(node *n) {
         free(n->value);
         free(n);
     }
-};
+}

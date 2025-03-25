@@ -29,6 +29,11 @@ cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CPP_COMPILER=g++ ..
 ``` sh
 cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CPP_COMPILER=clang++ ..
 ```
+- Enable DEBUG 
+
+``` sh
+cmake -DDEBUG=ON ..
+```
 - Then run make 
 ``` sh
 make

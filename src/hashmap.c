@@ -30,7 +30,7 @@ hashmap *init_hashmap() {
         h->buckets[i] = init_linked_list();
     }
     return h;
-};
+}
 
 int hashcode(int key_range, char *key, int key_length) {
     int code = 0;
@@ -78,7 +78,7 @@ int insert(hashmap *h, char *key, char *value){
     bucket->size++;
 
     return 1;
-};
+}
 
 item *create_item(char *key, char *value) {
     item *new_item = malloc(sizeof(item));
@@ -108,7 +108,7 @@ char *get(hashmap *h, char *key) {
         cur = cur->next;
     }
     return NULL;
-};
+}
 
 void free_linked_list(linked_list *ll) {
     if (ll) {
@@ -138,4 +138,4 @@ void free_hashmap(hashmap *h) {
         free(h->buckets);
         free(h);
     }
-};
+}

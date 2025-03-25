@@ -3,7 +3,8 @@ project(KAFKA_TOOL_BE_C LANGUAGES C)
 
 # Set default compiler to C 17
 set(CMAKE_C_COMPILER "gcc" CACHE STRING "C compiler (gcc/clang)")
-set(CMAKE_CXX_COMPILER "g++" CACHE STRING "C++ compiler (gcc/clang)")
+# set(CMAKE_CXX_COMPILER "g++" CACHE STRING "C++ compiler (g++/clang++)")
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Verify compiler
 if(NOT CMAKE_C_COMPILER)
@@ -38,7 +39,7 @@ elseif(CMAKE_C_COMPILER_ID MATCHES "Clang")
     )
 
     # Different flag for equivalent functionality
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-dead_strip")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections")
 endif()
 
 # Common GNU extensions configuration
@@ -50,8 +51,10 @@ add_compile_options(
   -Wno-overlength-strings
 )
 
-# Define macro
-# add_definitions(-DDEBUG)
+# Check if DEBUG is set on command line
+if(DEBUG)
+    add_definitions(-DDEBUG)
+endif()
 
 # Enable testing
 enable_testing()

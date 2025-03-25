@@ -1,7 +1,5 @@
 #include "http_query_string.h"
 #include "../common.h"
-#include <stdlib.h>
-#include <string.h>
 
 int parse_http_query_string(http_query_string **query_strings, size_t *query_string_count, char *query_string, int query_string_len) {
     int key_idx = 0;
@@ -44,7 +42,7 @@ int parse_http_query_string(http_query_string **query_strings, size_t *query_str
     free(value);
 
     return OK;
-};
+}
 
 
 int add_http_query_string(http_query_string **query_strings, size_t *query_string_count, char *key, char *value) {
@@ -58,7 +56,7 @@ int add_http_query_string(http_query_string **query_strings, size_t *query_strin
 
     (*query_string_count)++;
     return OK;
-};
+}
 
 
 void free_http_query_string(http_query_string *query_string) {
@@ -66,13 +64,13 @@ void free_http_query_string(http_query_string *query_string) {
         free(query_string->key);
         free(query_string->value);
     }
-};
+}
 
 
 void free_http_query_strings(http_query_string *query_strings, size_t query_string_count) {
-    for (int i = 0; i < query_string_count; i++) {
+    for (size_t i = 0; i < query_string_count; i++) {
         free_http_query_string(query_strings + i);
     }
 
     free(query_strings);
-};
+}

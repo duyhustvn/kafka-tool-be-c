@@ -5,6 +5,5 @@
 
 char* trim_left(char *s, int n);
 char* trim_right(char *s, int n);
-void cut_off_first_n_character(char* s, int n);
 
 #endif // STRING_UTIL_H_
