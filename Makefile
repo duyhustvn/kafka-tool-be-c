@@ -50,7 +50,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c $(DEPS)
 #	mkdir -p $(OBJ_DIR) $(LIBS)
 
 run:
-	KAFKA_BROKERS=172.17.0.1:9095 KAFKA_TOPIC=suricata KAFKA_GROUP_ID=test_client KAFKA_POLL_TIMEOUT_MS=100 ./build/kafka-tool-be-c
+	KAFKA_BROKERS=172.17.0.1:9095 KAFKA_TOPIC=suricata KAFKA_GROUP_ID=test_client KAFKA_POLL_TIMEOUT_MS=100 ${BIN_DIR}/${TARGET}
+
 
 # Clean up object files and executable
 clean:
@@ -58,4 +59,4 @@ clean:
 
 valgrind-check:
 	# valgrind -s --leak-check=yes --track-origins=yes ${BIN_DIR}/${TARGET}
-	valgrind -s --leak-check=full --show-leak-kinds=all --track-origins=yes ${BIN_DIR}/${TARGET}
+	KAFKA_BROKERS=172.17.0.1:9095 KAFKA_TOPIC=suricata KAFKA_GROUP_ID=test_client KAFKA_POLL_TIMEOUT_MS=100  valgrind -s --leak-check=full --show-leak-kinds=all --track-origins=yes ${BIN_DIR}/${TARGET}
