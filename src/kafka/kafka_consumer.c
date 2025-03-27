@@ -5,36 +5,62 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-static void print_assignment(const rd_kafka_t *rk,
-                             rd_kafka_topic_partition_list_t *partitions) {
-
-    printf("%s assigned partitions: ", rd_kafka_name(rk));
-    for (int i = 0; i < partitions->cnt; i++) {
-        const rd_kafka_topic_partition_t *p = &partitions->elems[i];
-        printf("[%d]%s", p->partition, (i != partitions->cnt - 1) ? ", ": "");
-    }
-    printf("\n");
+static void print_partition_list(FILE *fp,
+                                 const rd_kafka_topic_partition_list_t *partitions) {
+        int i;
+        for (i = 0; i < partitions->cnt; i++) {
+                warnx("%s [%" PRId32 "] offset %" PRId64,
+                      partitions->elems[i].topic,
+                      partitions->elems[i].partition,
+                      partitions->elems[i].offset);
+        }
 }
 
 static void rebalance_cb(rd_kafka_t *rk,
-                  rd_kafka_resp_err_t err,
-                  rd_kafka_topic_partition_list_t *partitions,
-                  void *opaque) {
-    warnx("Rebalance callback");
-    switch (err) {
+                         rd_kafka_resp_err_t err,
+                         rd_kafka_topic_partition_list_t *partitions,
+                         void *opaque) {
+        rd_kafka_error_t *error     = NULL;
+        rd_kafka_resp_err_t ret_err = RD_KAFKA_RESP_ERR_NO_ERROR;
+
+        warnx("Consumer group rebalanced");
+
+        switch (err) {
         case RD_KAFKA_RESP_ERR__ASSIGN_PARTITIONS:
-            print_assignment(rk, partitions);
-            rd_kafka_assign(rk, partitions);
-            break;
+                warnx("assigned (%s):\n", rd_kafka_rebalance_protocol(rk));
+                print_partition_list(stderr, partitions);
+
+                if (!strcmp(rd_kafka_rebalance_protocol(rk), "COOPERATIVE"))
+                        error = rd_kafka_incremental_assign(rk, partitions);
+                else
+                        ret_err = rd_kafka_assign(rk, partitions);
+                break;
+
         case RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS:
-            print_assignment(rk, partitions);
-            rd_kafka_assign(rk, NULL);
-            break;
+                warnx("revoked (%s):\n", rd_kafka_rebalance_protocol(rk));
+                print_partition_list(stderr, partitions);
+
+                if (!strcmp(rd_kafka_rebalance_protocol(rk), "COOPERATIVE")) {
+                        error = rd_kafka_incremental_unassign(rk, partitions);
+                } else {
+                        ret_err  = rd_kafka_assign(rk, NULL);
+                }
+                break;
+
         default:
-            rd_kafka_assign(rk, NULL);
-            warnx("Failed to rebalance partitions: %s", rd_kafka_err2str(err));
-    }
+                warnx("failed: %s\n", rd_kafka_err2str(err));
+                rd_kafka_assign(rk, NULL);
+                break;
+        }
+
+        if (error) {
+                warnx("incremental assign failure: %s", rd_kafka_error_string(error));
+                rd_kafka_error_destroy(error);
+        } else if (ret_err) {
+                warnx("assign failure: %s", rd_kafka_err2str(ret_err));
+        }
 }
+
 
 rd_kafka_conf_t *init_kafka_consumer_config(Config app_conf, char *errstr) {
     rd_kafka_conf_t *conf = rd_kafka_conf_new();
@@ -108,17 +134,22 @@ bool consume_message(KafkaConsumer *consumer, rd_kafka_topic_partition_list_t *t
         }
 
         if (msg->err) {
-            switch (msg->err) {
-                case RD_KAFKA_RESP_ERR__PARTITION_EOF:
-                    errstr = rd_kafka_message_errstr(msg);
-                    break;
-                default:
-                    errstr = rd_kafka_message_errstr(msg);
+            if (msg->err == RD_KAFKA_RESP_ERR__PARTITION_EOF) {
+                warnx("Consumer reached end of topic %s [%" PRId32"] message queue at offset %" PRId64 "\n", rd_kafka_topic_name(msg->rkt), msg->partition, msg->offset);
             }
-            warnx("[consume_message] failed %s", errstr);
+
+            if (msg->rkt) {
+                warnx("Consume error for topic %s [%" PRId32"] offset %" PRId64 ": %s\n", rd_kafka_topic_name(msg->rkt), msg->partition, msg->offset, rd_kafka_message_errstr(msg));
+            } else {
+                warnx("Consume error for topic %s: %s\n", rd_kafka_err2str(msg->err), rd_kafka_message_errstr(msg));
+            }
+
+            if (msg->err == RD_KAFKA_RESP_ERR__UNKNOWN_PARTITION || msg->err == RD_KAFKA_RESP_ERR__UNKNOWN_TOPIC) {
+                warnx("Consume error topic or partition doesn't exists");
+            }
         } else {
 #ifdef DEBUG
-        printf("Received message (offset %"PRId64", partition: %d): %.*s\n\n", msg->offset, msg->partition, (int)msg->len, (char*)msg->payload);
+        //printf("Received message (offset %"PRId64", partition: %d): %.*s\n\n", msg->offset, msg->partition, (int)msg->len, (char*)msg->payload);
 #endif
         }
 

@@ -11,6 +11,8 @@ typedef struct KafkaConsumer_ {
     volatile sig_atomic_t run;
 } KafkaConsumer;
 
+static void print_partition_list(FILE *fp,
+                                 const rd_kafka_topic_partition_list_t *partitions);
 static void rebalance_cb(rd_kafka_t *rk,
                          rd_kafka_resp_err_t err,
                          rd_kafka_topic_partition_list_t *partitions,
