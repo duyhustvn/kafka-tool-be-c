@@ -23,6 +23,9 @@ static void rebalance_cb(rd_kafka_t *rk,
         rd_kafka_error_t *error     = NULL;
         rd_kafka_resp_err_t ret_err = RD_KAFKA_RESP_ERR_NO_ERROR;
 
+        const char *topic = NULL;
+        rd_kafka_topic_t *rkt = NULL;
+
         warnx("Consumer group rebalanced");
 
         switch (err) {
@@ -30,10 +33,39 @@ static void rebalance_cb(rd_kafka_t *rk,
                 warnx("assigned (%s):\n", rd_kafka_rebalance_protocol(rk));
                 print_partition_list(stderr, partitions);
 
-                if (!strcmp(rd_kafka_rebalance_protocol(rk), "COOPERATIVE"))
-                        error = rd_kafka_incremental_assign(rk, partitions);
-                else
-                        ret_err = rd_kafka_assign(rk, partitions);
+                if (!strcmp(rd_kafka_rebalance_protocol(rk), "COOPERATIVE")) {
+                    error = rd_kafka_incremental_assign(rk, partitions);
+                } else {
+                    ret_err = rd_kafka_assign(rk, partitions);
+                }
+
+                // Seek to end of all assigned partitions
+                if (partitions->cnt > 0) {
+
+                    topic = partitions->elems[0].topic;
+                    rkt = rd_kafka_topic_new(rk, topic, NULL);
+
+                    if (!rkt) {
+                        warnx("Failed to create topic handle for %s", topic);
+                        break;
+                    }
+
+                    // Seek to the end of all partition to skip existing messages
+                    for (int i = 0; i < partitions->cnt; i++) {
+                        const rd_kafka_topic_partition_t *p = &partitions->elems[i];
+                        rd_kafka_resp_err_t seek_err;
+                        // seek to the end with 1s timeout
+                        seek_err = rd_kafka_seek(rkt, p->partition, RD_KAFKA_OFFSET_END, 1000);
+
+                        if (seek_err) {
+                            warnx("Seek failed for %s [%d]: %s", p->topic, p->partition, rd_kafka_err2str(seek_err));
+                        } else {
+                            warnx("Seek %s [%d] to the END (offset %d)", p->topic, p->partition, RD_KAFKA_OFFSET_END);
+                        }
+                    }
+
+                    rd_kafka_topic_destroy(rkt);
+                }
                 break;
 
         case RD_KAFKA_RESP_ERR__REVOKE_PARTITIONS:
@@ -41,12 +73,11 @@ static void rebalance_cb(rd_kafka_t *rk,
                 print_partition_list(stderr, partitions);
 
                 if (!strcmp(rd_kafka_rebalance_protocol(rk), "COOPERATIVE")) {
-                        error = rd_kafka_incremental_unassign(rk, partitions);
+                    error = rd_kafka_incremental_unassign(rk, partitions);
                 } else {
-                        ret_err  = rd_kafka_assign(rk, NULL);
+                    ret_err  = rd_kafka_assign(rk, NULL);
                 }
                 break;
-
         default:
                 warnx("failed: %s\n", rd_kafka_err2str(err));
                 rd_kafka_assign(rk, NULL);

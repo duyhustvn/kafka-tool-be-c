@@ -17,26 +17,22 @@ ceedling test:all
 ``` sh
 mkdir -p build
 ```
-- Go to build folder
-``` sh
-cd build
-```
 - Run cmake, by default it will use gcc compiler 
 ``` sh
-cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CPP_COMPILER=g++ ..
+cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_CPP_COMPILER=g++ -S . -B build
 ```
 - You can specify other compilter (clang, clang++) 
 ``` sh
-cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CPP_COMPILER=clang++ ..
+cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CPP_COMPILER=clang++ -S . -B build
 ```
 - Enable DEBUG 
 
 ``` sh
-cmake -DDEBUG=ON ..
+cmake -DDEBUG=ON -S . -B build
 ```
 - Then run make 
 ``` sh
-make
+cmake --build build
 ```
 - Add option VERBOSE=1 to view more log
 ``` sh
